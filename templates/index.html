@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}CineGlow | Book Your Movie Tickets{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-backdrop"></div>
+    <div class="hero-content container">
+        <span class="hero-badge"><i class="fa-solid fa-star"></i> NOW SHOWING IN 4K LASER & DOLBY 7.1</span>
+        <h1 class="hero-title">Book Your <span class="accent-text">Movie Tickets</span></h1>
+        <p class="hero-subtitle">
+            Immerse yourself in cinematic brilliance. Browse the latest blockbuster releases, choose your preferred showtime, pick luxury seats, and book tickets instantly.
+        </p>
+        
+        <div class="hero-actions">
+            <a href="#movies-section" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-ticket"></i> Explore Movies
+            </a>
+            <a href="{{ url_for('my_bookings') }}" class="btn btn-outline btn-lg">
+                <i class="fa-solid fa-magnifying-glass"></i> Check My Booking
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">6+</span>
+                <span class="stat-label">Blockbusters</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">₹200</span>
+                <span class="stat-label">Flat Ticket Price</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">Instant</span>
+                <span class="stat-label">Confirmation</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter and Search Bar -->
+<section id="movies-section" class="movies-section container">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title"><i class="fa-solid fa-film text-accent"></i> Now Showing</h2>
+            <p class="section-subtitle">Select a movie to choose your showtime and seats</p>
+        </div>
+        
+        <div class="search-filter-controls">
+            <!-- Search Input -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="movie-search-input" placeholder="Search movies by title..." autocomplete="off">
+                <button type="button" id="clear-search-btn" class="clear-btn" style="display: none;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Genre Filter Pills -->
+            <div class="genre-filters" id="genre-filter-group">
+                <button class="genre-pill active" data-genre="all">All</button>
+                <button class="genre-pill" data-genre="Sci-Fi">Sci-Fi</button>
+                <button class="genre-pill" data-genre="Action">Action</button>
+                <button class="genre-pill" data-genre="Fantasy">Fantasy</button>
+                <button class="genre-pill" data-genre="Horror">Horror</button>
+                <button class="genre-pill" data-genre="Drama">Drama</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movie Grid -->
+    <div class="movies-grid" id="movies-grid">
+        {% for movie in movies %}
+        <div class="movie-card" data-genre="{{ movie.genre }}" data-title="{{ movie.title | lower }}">
+            <div class="movie-poster-wrap">
+                <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster" loading="lazy">
+                <div class="poster-overlay">
+                    <span class="overlay-genre-badge">{{ movie.genre.split('/')[0].strip() }}</span>
+                    <a href="{{ url_for('book_movie', movie_id=movie.id) }}" class="btn btn-primary overlay-btn">
+                        <i class="fa-solid fa-chair"></i> Select Seats
+                    </a>
+                </div>
+                <div class="rating-badge">
+                    <i class="fa-solid fa-star"></i> {{ "%.1f"|format(movie.rating) }}
+                </div>
+            </div>
+            
+            <div class="movie-info">
+                <div class="movie-meta-tags">
+                    <span class="meta-tag"><i class="fa-regular fa-clock"></i> {{ movie.duration }}</span>
+                    <span class="meta-tag"><i class="fa-solid fa-globe"></i> {{ movie.language }}</span>
+                    <span class="meta-tag price-tag">₹200 / seat</span>
+                </div>
+
+                <h3 class="movie-title">{{ movie.title }}</h3>
+                <p class="movie-genre"><i class="fa-solid fa-tags"></i> {{ movie.genre }}</p>
+                <p class="movie-desc">{{ movie.description }}</p>
+
+                <div class="movie-card-footer">
+                    <a href="{{ url_for('book_movie', movie_id=movie.id) }}" class="btn btn-primary btn-block book-btn">
+                        <i class="fa-solid fa-ticket"></i> Book Tickets
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Results Placeholder -->
+    <div id="no-movies-found" class="no-results-box" style="display: none;">
+        <i class="fa-solid fa-film-slash"></i>
+        <h3>No movies matched your search</h3>
+        <p>Try clearing filters or searching for another title.</p>
+        <button id="reset-filters-btn" class="btn btn-outline btn-sm">Reset Filters</button>
+    </div>
+</section>
+
+<!-- Cinema Experience Highlights -->
+<section id="experience" class="experience-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2 class="section-title">The Ultimate Cinema Experience</h2>
+            <p class="section-subtitle">Crafted with cutting-edge theater technology for pure immersion</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-volume-high"></i></div>
+                <h3>Dolby Atmos 7.1</h3>
+                <p>Multi-dimensional spatial sound that flows all around you with breathtaking realism.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-tv"></i></div>
+                <h3>4K Laser Projection</h3>
+                <p>Ultra-crisp visual clarity, vibrant color spectrum, and deep contrast ratios on our massive screens.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-couch"></i></div>
+                <h3>Luxury Recliners</h3>
+                <p>Motorized ergonomic leather seats with plush leg rests and generous personal space.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+                <h3>Contactless M-Tickets</h3>
+                <p>Instant digital booking with unique barcodes for seamless entry right from your phone.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

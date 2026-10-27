@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Tickets: {{ movie.title }} | CineGlow{% endblock %}
+
+{% block content %}
+<div class="booking-page-container container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a href="{{ url_for('index') }}"><i class="fa-solid fa-arrow-left"></i> Back to Movies</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">{{ movie.title }}</span>
+    </nav>
+
+    <!-- Top Movie Summary Card -->
+    <div class="selected-movie-banner">
+        <div class="movie-banner-poster">
+            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" id="banner-poster-img">
+        </div>
+        <div class="movie-banner-details">
+            <div class="banner-genre-badge">{{ movie.genre }}</div>
+            <h1 class="banner-movie-title" id="banner-movie-title">{{ movie.title }}</h1>
+            <div class="banner-meta">
+                <span><i class="fa-regular fa-clock text-accent"></i> {{ movie.duration }}</span>
+                <span><i class="fa-solid fa-star text-gold"></i> {{ "%.1f"|format(movie.rating) }} Rating</span>
+                <span><i class="fa-solid fa-language text-accent"></i> {{ movie.language }}</span>
+                <span class="banner-price-tag">₹{{ ticket_price }} / Seat</span>
+            </div>
+            <p class="banner-synopsis">{{ movie.description }}</p>
+        </div>
+    </div>
+
+    <!-- Booking Workflow Grid: Left = Date/Time/Seats, Right = Summary & Form -->
+    <div class="booking-grid">
+        <!-- Main Interactive Column -->
+        <div class="booking-main-col">
+            <!-- STEP 1: Select Date -->
+            <div class="booking-step-card">
+                <div class="step-header">
+                    <span class="step-num">1</span>
+                    <h3>Select Date</h3>
+                </div>
+                <div class="date-selector-group" id="date-selector-group">
+                    {% for d in available_dates %}
+                    <button type="button" 
+                            class="date-pill-btn {% if loop.first %}active{% endif %}" 
+                            data-date="{{ d.iso }}"
+                            data-is-today="{{ 'true' if d.is_today else 'false' }}">
+                        <span class="date-day">{{ d.display.split(',')[0] }}</span>
+                        <span class="date-sub">{{ d.display.split(',')[1].strip() }}</span>
+                        {% if d.is_today %}<span class="today-tag">Today</span>{% endif %}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- STEP 2: Select Showtime -->
+            <div class="booking-step-card">
+                <div class="step-header">
+                    <span class="step-num">2</span>
+                    <h3>Select Showtime</h3>
+                </div>
+                <div class="time-selector-group" id="time-selector-group">
+                    {% for time in showtimes %}
+                    <button type="button" 
+                            class="time-pill-btn" 
+                            data-time="{{ time }}">
+                        <i class="fa-regular fa-clock"></i> {{ time }}
+                        <span class="slot-tag">Dolby 7.1</span>
+                    </button>
+                    {% endfor %}
+                </div>
+                <div id="past-time-notice" class="notice-text" style="display: none;">
+                    <i class="fa-solid fa-circle-info"></i> Grayed out showtimes have already ended for today.
+                </div>
+            </div>
+
+            <!-- STEP 3: Interactive Seat Selection -->
+            <div class="booking-step-card seat-selection-card">
+                <div class="step-header">
+                    <span class="step-num">3</span>
+                    <div class="step-title-row">
+                        <h3>Select Seats</h3>
+                        <span class="hall-name"><i class="fa-solid fa-film"></i> Auditorium 1 - 4K Laser</span>
+                    </div>
+                </div>
+
+                <!-- Seat Color Legend -->
+                <div class="seat-legend">
+                    <div class="legend-item">
+                        <div class="seat-indicator seat-available"></div>
+                        <span>Available (Green)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="seat-indicator seat-selected"></div>
+                        <span>Selected (Blue)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="seat-indicator seat-booked"></div>
+                        <span>Booked (Gray)</span>
+                    </div>
+                </div>
+
+                <!-- Cinema Screen Visualization -->
+                <div class="screen-area">
+                    <div class="screen-curve"></div>
+                    <p class="screen-label"><i class="fa-solid fa-arrows-up-down"></i> ALL EYES THIS WAY • CINEMA SCREEN</p>
+                </div>
+
+                <!-- Interactive Seat Grid -->
+                <div class="seating-plan-container" id="seating-plan-container">
+                    <div class="seating-loading-overlay" id="seat-loading-overlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Checking live seat availability...</p>
+                    </div>
+                    <div class="seat-rows-wrapper" id="seat-rows-wrapper">
+                        <!-- Dynamically populated rows A to F with central aisle -->
+                    </div>
+                </div>
+
+                <div class="seat-selection-hint">
+                    <i class="fa-solid fa-lightbulb text-gold"></i>
+                    Click any available green seat to select or deselect. You can choose multiple seats.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Booking Summary & Customer Details -->
+        <div class="booking-sidebar-col">
+            <div class="checkout-card sticky-card">
+                <h3 class="checkout-title"><i class="fa-solid fa-receipt text-accent"></i> Booking Summary</h3>
+                
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span class="summary-label">Movie</span>
+                        <span class="summary-value font-bold" id="summary-movie">{{ movie.title }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Date</span>
+                        <span class="summary-value" id="summary-date">Today</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Showtime</span>
+                        <span class="summary-value" id="summary-time">--:--</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Selected Seats</span>
+                        <span class="summary-value highlight-seats" id="summary-seats">None selected</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Tickets</span>
+                        <span class="summary-value" id="summary-quantity">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Price per Seat</span>
+                        <span class="summary-value">₹{{ ticket_price }}</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-row total-row">
+                        <span class="total-label">Total Amount</span>
+                        <span class="total-price" id="summary-total">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Customer Details Form -->
+                <form id="booking-form" class="customer-form" novalidate>
+                    <h4 class="form-section-title"><i class="fa-regular fa-user text-accent"></i> Customer Details</h4>
+
+                    <div class="form-group">
+                        <label for="customer_name">Full Name <span class="req">*</span></label>
+                        <div class="input-with-icon">
+                            <i class="fa-regular fa-user"></i>
+                            <input type="text" id="customer_name" name="customer_name" placeholder="e.g. John Doe" required autocomplete="name">
+                        </div>
+                        <span class="error-msg" id="name-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_email">Email Address <span class="req">*</span></label>
+                        <div class="input-with-icon">
+                            <i class="fa-regular fa-envelope"></i>
+                            <input type="email" id="customer_email" name="customer_email" placeholder="e.g. john@example.com" required autocomplete="email">
+                        </div>
+                        <span class="error-msg" id="email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer_phone">Phone Number <span class="req">*</span></label>
+                        <div class="input-with-icon">
+                            <i class="fa-solid fa-phone"></i>
+                            <input type="tel" id="customer_phone" name="customer_phone" placeholder="e.g. 9876543210" required autocomplete="tel">
+                        </div>
+                        <span class="error-msg" id="phone-error"></span>
+                    </div>
+
+                    <div class="form-alert" id="form-general-alert" style="display: none;"></div>
+
+                    <button type="submit" id="confirm-booking-btn" class="btn btn-primary btn-block btn-lg" disabled>
+                        <span class="btn-text"><i class="fa-solid fa-lock"></i> Confirm Booking (₹0)</span>
+                        <span class="btn-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin"></i> Reserving...</span>
+                    </button>
+
+                    <p class="secure-checkout-notice">
+                        <i class="fa-solid fa-shield-check text-green"></i> SQLite Transaction-Safe Booking
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Injected server configuration for booking.js
+    const BOOKING_CONFIG = {
+        movieId: {{ movie.id }},
+        movieTitle: {{ movie.title | tojson }},
+        ticketPrice: {{ ticket_price }},
+        availableDates: {{ available_dates | tojson }},
+        showtimes: {{ showtimes | tojson }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% endblock %}

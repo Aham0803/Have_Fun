@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings | CineGlow Cinemas{% endblock %}
+
+{% block content %}
+<div class="my-bookings-container container">
+    <div class="page-header text-center">
+        <span class="sub-badge"><i class="fa-solid fa-ticket text-accent"></i> TICKET RETRIEVAL</span>
+        <h1 class="page-title">Find Your <span class="accent-text">Bookings</span></h1>
+        <p class="page-subtitle">
+            Enter your unique Booking ID and registered email address below to view, download, or print your movie tickets.
+        </p>
+    </div>
+
+    <!-- Search Form Card -->
+    <div class="search-card-wrapper">
+        <form id="search-booking-form" class="lookup-form" novalidate>
+            <div class="lookup-grid">
+                <div class="form-group">
+                    <label for="lookup_booking_id">Booking ID <span class="req">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-hashtag"></i>
+                        <input type="text" id="lookup_booking_id" name="booking_id" placeholder="e.g. BK-9F8C21" required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lookup_email">Registered Email <span class="req">*</span></label>
+                    <div class="input-with-icon">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="lookup_email" name="email" placeholder="e.g. customer@example.com" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group submit-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" id="search-submit-btn" class="btn btn-primary btn-block">
+                        <span class="btn-text"><i class="fa-solid fa-magnifying-glass"></i> Find Ticket</span>
+                        <span class="btn-spinner" style="display: none;"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="lookup-alert" class="form-alert" style="display: none;"></div>
+        </form>
+    </div>
+
+    <!-- Results Container -->
+    <div id="booking-result-area" class="booking-result-area" style="display: none;">
+        <!-- Dynamic Result Card will be inserted here via my-bookings.js -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/my-bookings.js') }}"></script>
+{% endblock %}

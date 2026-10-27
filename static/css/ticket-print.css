@@ -1,0 +1,116 @@
+/* ===================================================================
+   TICKET PRINT STYLESHEET
+   Clean, printer-friendly layout for printing movie passes
+   =================================================================== */
+
+@media print {
+    /* Hide everything except ticket */
+    .site-header,
+    .site-footer,
+    .no-print,
+    .ticket-action-bar,
+    .toast-container,
+    .breadcrumb-nav {
+        display: none !important;
+    }
+
+    body.cinema-body {
+        background: #ffffff !important;
+        color: #111827 !important;
+        background-image: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .confirmation-page-container {
+        padding: 0 !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+    }
+
+    .ticket-wrapper {
+        max-width: 100% !important;
+        margin: 20px auto !important;
+    }
+
+    .cinema-ticket {
+        background: #ffffff !important;
+        color: #111827 !important;
+        border: 2px solid #111827 !important;
+        box-shadow: none !important;
+        border-radius: 12px !important;
+        page-break-inside: avoid;
+    }
+
+    .ticket-main-stub {
+        background: #ffffff !important;
+        color: #111827 !important;
+    }
+
+    .ticket-logo {
+        color: #111827 !important;
+    }
+
+    .ticket-movie-title {
+        color: #000000 !important;
+    }
+
+    .ticket-meta-grid {
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    .meta-value {
+        color: #0f172a !important;
+    }
+
+    .meta-label {
+        color: #475569 !important;
+    }
+
+    .seat-pill {
+        background: #1e293b !important;
+        color: #ffffff !important;
+        border: 1px solid #0f172a !important;
+    }
+
+    .ticket-customer-info {
+        color: #334155 !important;
+    }
+
+    .ticket-perforation {
+        display: none !important;
+    }
+
+    .ticket-side-stub {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border-left: 2px dashed #94a3b8 !important;
+        width: 240px !important;
+    }
+
+    .stub-code {
+        color: #000000 !important;
+    }
+
+    .stub-info-block {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .stub-amount {
+        color: #0f172a !important;
+    }
+
+    .mockup-barcode span {
+        background: #000000 !important;
+    }
+
+    .barcode-number {
+        color: #475569 !important;
+    }
+
+    .ticket-poster-col img {
+        filter: grayscale(20%);
+    }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CineGlow | Book Your Movie Tickets{% endblock %}</title>
+    <meta name="description" content="Book cinema tickets online with interactive seat selection, instant confirmation, and the best cinema experience.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="cinema-body">
+    <!-- Navbar -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo-brand">
+                <span class="logo-icon"><i class="fa-solid fa-film"></i></span>
+                <span class="logo-text">CINE<span class="accent-text">GLOW</span></span>
+            </a>
+            
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-clapperboard"></i> Movies</a></li>
+                    <li><a href="{{ url_for('my_bookings') }}" class="nav-link {% if request.path == '/my-bookings' %}active{% endif %}"><i class="fa-solid fa-ticket"></i> My Bookings</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="{{ url_for('index') }}#movies-section" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-play"></i> Book Now
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Cinema Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo-brand">
+                    <span class="logo-icon"><i class="fa-solid fa-film"></i></span>
+                    <span class="logo-text">CINE<span class="accent-text">GLOW</span></span>
+                </div>
+                <p class="footer-desc">
+                    Your premier cinema destination. Immersive audiovisuals, ultra-plush seating, and seamless digital ticketing.
+                </p>
+                <div class="cinema-perks">
+                    <span><i class="fa-solid fa-volume-high text-accent"></i> Dolby Atmos</span>
+                    <span><i class="fa-solid fa-tv text-accent"></i> 4K Laser</span>
+                    <span><i class="fa-solid fa-couch text-accent"></i> VIP Recliners</span>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Now Showing</a></li>
+                    <li><a href="{{ url_for('my_bookings') }}">Find My Booking</a></li>
+                    <li><a href="{{ url_for('index') }}#experience">Cinema Experience</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h4>Cinema Concierge</h4>
+                <p><i class="fa-solid fa-location-dot"></i> 742 Galaxy Boulevard, Metroplex</p>
+                <p><i class="fa-solid fa-phone"></i> +91 (800) 246-3456</p>
+                <p><i class="fa-solid fa-envelope"></i> bookings@cineglowcinema.com</p>
+                <p class="ticket-price-badge"><i class="fa-solid fa-tag"></i> Standard Ticket: ₹200</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container footer-bottom-inner">
+                <p>&copy; 2026 CineGlow Cinemas. All rights reserved.</p>
+                <p class="safe-tag"><i class="fa-solid fa-shield-halved"></i> 100% Secure SQLite-Powered Ticketing</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
