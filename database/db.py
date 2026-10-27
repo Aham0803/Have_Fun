@@ -135,8 +135,8 @@ class PostgresConnectionWrapper:
 def get_db_connection():
     """
     Returns a database connection:
-    - If DATABASE_URL is set, connects to Supabase / PostgreSQL.
-    - Otherwise, falls back to local SQLite (cinema.db).
+    - If DATABASE_URL is set, attempts connection to Supabase / PostgreSQL.
+    - If connection fails or DATABASE_URL is not set, gracefully falls back to SQLite.
     """
     db_url = os.environ.get("DATABASE_URL", "").strip()
 
@@ -145,21 +145,25 @@ def get_db_connection():
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
         
-        conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
-        conn.autocommit = False
-        return PostgresConnectionWrapper(conn)
-    else:
-        conn = sqlite3.connect(DB_PATH, timeout=10)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON;")
-        return conn
+        try:
+            conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor, connect_timeout=5)
+            conn.autocommit = False
+            return PostgresConnectionWrapper(conn)
+        except Exception as e:
+            print(f"[DB Warning] Could not connect to Supabase/PostgreSQL ({e}). Falling back to SQLite.")
+            # Fall back to SQLite below
+    
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON;")
+    return conn
 
 def init_db():
     """Initializes tables and seeds sample movies if table is empty."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    if is_postgres():
+    if isinstance(conn, PostgresConnectionWrapper):
         # PostgreSQL Schema for Supabase
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS movies (
